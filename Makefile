@@ -41,7 +41,7 @@ lint:  ## Run code style checks
 
 .PHONY: test
 test:  ## Run tests on the module
-	pytest -xvvs tests
+	pytest -xvvs --test-role-arn "arn:aws:iam::303467602807:role/key-tester" tests
 
 .PHONY: test-keep
 test-keep:  ## Run a test and keep resources
