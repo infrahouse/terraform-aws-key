@@ -30,6 +30,6 @@ variable "service_name" {
 
 variable "tags" {
   description = "A map of tags to add to resources."
-  type = map(string)
+  type        = map(string)
   default     = {}
 }
