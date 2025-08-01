@@ -1,0 +1,4 @@
+aws-encryption-sdk ~= 4.0
+aws-cryptographic-material-providers ~= 1.11
+pytest-infrahouse ~= 0.9, >= 0.9.2
+infrahouse-core ~= 0.14
