@@ -1,6 +1,6 @@
 resource "aws_kms_key" "main" {
   description         = var.key_description
-  enable_key_rotation = true
+  enable_key_rotation = false
   tags = merge(
     local.default_module_tags,
     {
