@@ -42,6 +42,18 @@ def probe_role(boto3_session, keep_after, test_role_arn, aws_region):
         yield tf_output
 
 
+def get_boto_client_by_role(service, role_name, test_role_arn, region):
+    response = boto3.client("sts").assume_role(
+        RoleArn=role_name, RoleSessionName=test_role_arn.split("/")[1]
+    )
+    # noinspection PyUnresolvedReferences
+    return boto3.Session(
+        aws_access_key_id=response["Credentials"]["AccessKeyId"],
+        aws_secret_access_key=response["Credentials"]["SecretAccessKey"],
+        aws_session_token=response["Credentials"]["SessionToken"],
+    ).client(service, region_name=region)
+
+
 # Copied from https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/python-example-code.html
 """
 This example sets up the KMS Keyring

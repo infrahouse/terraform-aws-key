@@ -9,6 +9,7 @@ from tests.conftest import (
     TERRAFORM_ROOT_DIR,
     encrypt_with_keyring,
     decrypt_with_keyring,
+    get_boto_client_by_role,
 )
 
 
@@ -19,6 +20,7 @@ def test_module(
     aws_region,
     boto3_session,
 ):
+    probe_role_arn = probe_role["role_arn"]["value"]
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
@@ -26,6 +28,7 @@ def test_module(
             dedent(
                 f"""
                     region              = "{aws_region}"
+                    key_users = ["{probe_role_arn}"]
                     """
             )
         )
@@ -47,16 +50,19 @@ def test_module(
         kms_key_arn = tf_output["kms_key_arn"]["value"]
         plaintext_message = b"Hello world"
 
+        kms_client = get_boto_client_by_role(
+            "kms", probe_role_arn, test_role_arn, aws_region
+        )
         cipher_text = encrypt_with_keyring(
             plaintext_message,
             kms_key_arn,
-            kms_client=boto3_session.client("kms", region_name=aws_region),
+            kms_client=kms_client,
         )
         assert (
             decrypt_with_keyring(
                 cipher_text,
                 kms_key_arn,
-                kms_client=boto3_session.client("kms", region_name=aws_region),
+                kms_client=kms_client,
             )
             == plaintext_message
         )
