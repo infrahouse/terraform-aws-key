@@ -5,7 +5,7 @@
 ```hcl
 module "test" {
   source  = "infrahouse/key/aws"
-  version = "0.1.0"
+  version = "0.2.0"
 
   environment     = "development"
   service_name    = "key-test"
