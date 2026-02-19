@@ -23,6 +23,18 @@ variable "key_users" {
   default     = null
 }
 
+variable "key_encrypt_only_users" {
+  description = "A list of IAM role ARNs that are allowed to encrypt with the key but not decrypt."
+  type        = list(string)
+  default     = null
+}
+
+variable "key_decrypt_only_users" {
+  description = "A list of IAM role ARNs that are allowed to decrypt with the key but not encrypt."
+  type        = list(string)
+  default     = null
+}
+
 variable "service_name" {
   description = "A descriptive name for the service that owns the queue."
   type        = string
