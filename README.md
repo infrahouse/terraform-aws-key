@@ -16,6 +16,8 @@ module "test" {
   ]
 }
 ```
+<!-- BEGIN_TF_DOCS -->
+
 ## Requirements
 
 | Name | Version |
@@ -46,7 +48,9 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name string. | `string` | n/a | yes |
+| <a name="input_key_decrypt_only_users"></a> [key\_decrypt\_only\_users](#input\_key\_decrypt\_only\_users) | A list of IAM role ARNs that are allowed to decrypt with the key but not encrypt. | `list(string)` | `null` | no |
 | <a name="input_key_description"></a> [key\_description](#input\_key\_description) | A human readable description for the key. | `string` | n/a | yes |
+| <a name="input_key_encrypt_only_users"></a> [key\_encrypt\_only\_users](#input\_key\_encrypt\_only\_users) | A list of IAM role ARNs that are allowed to encrypt with the key but not decrypt. | `list(string)` | `null` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | A descriptive one word name for the key. Letters, digits, and \_-/ are allowed. | `string` | n/a | yes |
 | <a name="input_key_users"></a> [key\_users](#input\_key\_users) | A list of IAM role ARNs that are allowed to use the key. | `list(string)` | `null` | no |
 | <a name="input_service_name"></a> [service\_name](#input\_service\_name) | A descriptive name for the service that owns the queue. | `string` | n/a | yes |
@@ -56,4 +60,5 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_kms_key_arn"></a> [kms\_key\_arn](#output\_kms\_key\_arn) | n/a |
+| <a name="output_kms_key_arn"></a> [kms\_key\_arn](#output\_kms\_key\_arn) | The Amazon Resource Name (ARN) of the KMS key created by this module. |
+<!-- END_TF_DOCS -->
