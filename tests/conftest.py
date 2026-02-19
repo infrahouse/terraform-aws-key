@@ -1,12 +1,7 @@
 import logging
-from os import path as osp
-from textwrap import dedent
+
 import boto3
-
-
-import pytest
 from infrahouse_core.logging import setup_logging
-from pytest_infrahouse import terraform_apply
 
 TERRAFORM_ROOT_DIR = "test_data"
 
@@ -15,43 +10,6 @@ LOG = logging.getLogger(__name__)
 
 
 setup_logging(LOG, debug=True)
-
-
-@pytest.fixture()
-def probe_role(boto3_session, keep_after, test_role_arn, aws_region):
-    terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "probe_role")
-    # Create service network
-    with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
-                role_arn     = "{test_role_arn}"
-                region       = "{aws_region}"
-                trusted_arns = [
-                    "arn:aws:iam::990466748045:user/aleks",
-                    "{test_role_arn}"
-                ]
-                """
-            )
-        )
-    with terraform_apply(
-        terraform_module_dir,
-        destroy_after=not keep_after,
-        json_output=True,
-    ) as tf_output:
-        yield tf_output
-
-
-def get_boto_client_by_role(service, role_name, test_role_arn, region):
-    response = boto3.client("sts").assume_role(
-        RoleArn=role_name, RoleSessionName=test_role_arn.split("/")[1]
-    )
-    # noinspection PyUnresolvedReferences
-    return boto3.Session(
-        aws_access_key_id=response["Credentials"]["AccessKeyId"],
-        aws_secret_access_key=response["Credentials"]["SecretAccessKey"],
-        aws_session_token=response["Credentials"]["SessionToken"],
-    ).client(service, region_name=region)
 
 
 # Copied from https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/python-example-code.html

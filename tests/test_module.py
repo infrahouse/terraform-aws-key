@@ -4,6 +4,7 @@ from textwrap import dedent
 
 import pytest
 from botocore.exceptions import ClientError
+from infrahouse_core.aws import get_client
 from pytest_infrahouse import terraform_apply
 
 from tests.conftest import (
@@ -11,7 +12,6 @@ from tests.conftest import (
     TERRAFORM_ROOT_DIR,
     encrypt_with_keyring,
     decrypt_with_keyring,
-    get_boto_client_by_role,
 )
 
 
@@ -52,8 +52,8 @@ def test_module(
         kms_key_arn = tf_output["kms_key_arn"]["value"]
         plaintext_message = b"Hello world"
 
-        kms_client = get_boto_client_by_role(
-            "kms", probe_role_arn, test_role_arn, aws_region
+        kms_client = get_client(
+            "kms", role_arn=probe_role_arn, region=aws_region
         )
         cipher_text = encrypt_with_keyring(
             plaintext_message,

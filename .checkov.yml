@@ -1,0 +1,24 @@
+# Checkov configuration for terraform-aws-key module
+
+framework:
+  - terraform
+
+skip-check:
+  # CKV_TF_1: Module sources use version pins from Terraform registry
+  - CKV_TF_1
+
+  # CKV_AWS_111: KMS key policy uses "kms:*" for root account - this is the
+  # AWS-recommended default key policy that enables IAM policy-based access control.
+  # "resources": ["*"] in a key policy refers to the key itself, not all resources.
+  - CKV_AWS_111
+
+  # CKV_AWS_356: Same as above - "*" resource in a KMS key policy means "this key",
+  # not a wildcard across all KMS keys. This is standard for resource-based policies.
+  - CKV_AWS_356
+
+  # CKV_AWS_109: Root account kms:* grant is required to delegate KMS permissions
+  # via IAM policies. Without it, only the key policy can grant access.
+  - CKV_AWS_109
+
+compact: true
+quiet: false
