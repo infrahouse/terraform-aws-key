@@ -111,8 +111,8 @@ def test_split_permissions(
         kms_key_arn = tf_output["kms_key_arn"]["value"]
         plaintext_message = b"Hello world"
 
-        kms_client = get_boto_client_by_role(
-            "kms", probe_role_arn, test_role_arn, aws_region
+        kms_client = get_client(
+            "kms", role_arn=probe_role_arn, region=aws_region
         )
 
         # Verify that the key can still be used for encrypt and decrypt
