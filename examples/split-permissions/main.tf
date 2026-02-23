@@ -1,6 +1,6 @@
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.2.0"
+  version = "0.3.0"
 
   environment     = "production"
   service_name    = "data-pipeline"
