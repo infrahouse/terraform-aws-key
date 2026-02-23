@@ -2,9 +2,9 @@ import json
 from os import path as osp
 from textwrap import dedent
 
+import boto3
 import pytest
 from botocore.exceptions import ClientError
-from infrahouse_core.aws import get_client
 from pytest_infrahouse import terraform_apply
 
 from tests.conftest import (
@@ -15,6 +15,29 @@ from tests.conftest import (
 )
 
 
+def get_probe_client(
+    boto3_session: boto3.Session, service_name: str, role_arn: str, region: str
+) -> boto3.client:
+    """Assume a probe role via the test session and return a service client.
+
+    :param boto3_session: A boto3 session with credentials trusted by the probe role.
+    :param service_name: AWS service name (e.g., "kms").
+    :param role_arn: The ARN of the probe role to assume.
+    :param region: AWS region name.
+    :return: A boto3 client for the specified service using probe role credentials.
+    """
+    sts = boto3_session.client("sts", region_name=region)
+    response = sts.assume_role(RoleArn=role_arn, RoleSessionName="probe-role-test")
+    creds = response["Credentials"]
+    probe_session = boto3.Session(
+        aws_access_key_id=creds["AccessKeyId"],
+        aws_secret_access_key=creds["SecretAccessKey"],
+        aws_session_token=creds["SessionToken"],
+        region_name=region,
+    )
+    return probe_session.client(service_name, region_name=region)
+
+
 def test_module(
     probe_role,
     test_role_arn,
@@ -22,6 +45,7 @@ def test_module(
     aws_region,
     boto3_session,
 ):
+    """Test that key_users can both encrypt and decrypt."""
     probe_role_arn = probe_role["role_arn"]["value"]
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
@@ -52,7 +76,7 @@ def test_module(
         kms_key_arn = tf_output["kms_key_arn"]["value"]
         plaintext_message = b"Hello world"
 
-        kms_client = get_client("kms", role_arn=probe_role_arn, region=aws_region)
+        kms_client = get_probe_client(boto3_session, "kms", probe_role_arn, aws_region)
         cipher_text = encrypt_with_keyring(
             plaintext_message,
             kms_key_arn,
@@ -105,7 +129,7 @@ def test_encrypt_only_permissions(
         LOG.info("%s", json.dumps(tf_output, indent=4))
         kms_key_arn = tf_output["kms_key_arn"]["value"]
 
-        kms_client = get_client("kms", role_arn=probe_role_arn, region=aws_region)
+        kms_client = get_probe_client(boto3_session, "kms", probe_role_arn, aws_region)
 
         # Encrypt should succeed
         response = kms_client.encrypt(
@@ -169,7 +193,7 @@ def test_decrypt_only_permissions(
         )
         ciphertext_blob = response["CiphertextBlob"]
 
-        kms_client = get_client("kms", role_arn=probe_role_arn, region=aws_region)
+        kms_client = get_probe_client(boto3_session, "kms", probe_role_arn, aws_region)
 
         # Decrypt should succeed
         response = kms_client.decrypt(

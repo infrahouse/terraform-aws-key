@@ -1,5 +1,8 @@
-variable "region" {}
+variable "region" {
+  type = string
+}
 variable "role_arn" {
+  type    = string
   default = null
 }
 variable "key_users" {

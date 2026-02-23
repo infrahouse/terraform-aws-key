@@ -2,3 +2,5 @@ aws-encryption-sdk ~= 4.0
 aws-cryptographic-material-providers ~= 1.11
 pytest-infrahouse ~= 0.24
 infrahouse-core ~= 0.14
+
+checkov ~= 3.1
