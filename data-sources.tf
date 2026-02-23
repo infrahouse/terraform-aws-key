@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "key_policy" {
     resources = ["*"]
   }
   dynamic "statement" {
-    for_each = var.key_users == null ? [] : [1]
+    for_each = try(length(var.key_users), 0) > 0 ? [1] : []
     content {
       sid = "Allow use of the key"
       principals {
@@ -25,6 +25,38 @@ data "aws_iam_policy_document" "key_policy" {
         "kms:Decrypt",
         "kms:ReEncrypt*",
         "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = try(length(var.key_encrypt_only_users), 0) > 0 ? [1] : []
+    content {
+      sid = "Allow encrypt only"
+      principals {
+        identifiers = var.key_encrypt_only_users
+        type        = "AWS"
+      }
+      actions = [
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = try(length(var.key_decrypt_only_users), 0) > 0 ? [1] : []
+    content {
+      sid = "Allow decrypt only"
+      principals {
+        identifiers = var.key_decrypt_only_users
+        type        = "AWS"
+      }
+      actions = [
+        "kms:Decrypt",
         "kms:DescribeKey"
       ]
       resources = ["*"]
