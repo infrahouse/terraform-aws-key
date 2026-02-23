@@ -18,13 +18,33 @@ variable "key_name" {
 }
 
 variable "key_users" {
-  description = "A list of IAM role ARNs that are allowed to use the key."
+  description = "A list of IAM role ARNs that are allowed to use the key for both encrypt and decrypt."
+  type        = list(string)
+  default     = null
+}
+
+variable "key_encrypt_only_users" {
+  description = <<-EOT
+    A list of IAM role ARNs that are allowed to encrypt with the key but not decrypt.
+    If a role appears in both this list and key_decrypt_only_users, it will effectively
+    have full encrypt+decrypt access (equivalent to key_users).
+  EOT
+  type        = list(string)
+  default     = null
+}
+
+variable "key_decrypt_only_users" {
+  description = <<-EOT
+    A list of IAM role ARNs that are allowed to decrypt with the key but not encrypt.
+    If a role appears in both this list and key_encrypt_only_users, it will effectively
+    have full encrypt+decrypt access (equivalent to key_users).
+  EOT
   type        = list(string)
   default     = null
 }
 
 variable "service_name" {
-  description = "A descriptive name for the service that owns the queue."
+  description = "A descriptive name for the service that owns the key."
   type        = string
 }
 
