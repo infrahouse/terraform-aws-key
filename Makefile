@@ -30,6 +30,8 @@ install-hooks:  ## Install repo hooks
 	@test -d .git/hooks || (echo "Looks like you are not in a Git repo" ; exit 1)
 	@test -L .git/hooks/pre-commit || ln -fs ../../hooks/pre-commit .git/hooks/pre-commit
 	@chmod +x .git/hooks/pre-commit
+	@test -L .git/hooks/commit-msg || ln -fs ../../hooks/commit-msg .git/hooks/commit-msg
+	@chmod +x .git/hooks/commit-msg
 
 .PHONY: format
 format:  ## Format terraform files
@@ -62,7 +64,7 @@ test-clean:  ## Run a test and destroy resources
 		tests/test_module.py
 
 .PHONY: bootstrap
-bootstrap: ## bootstrap the development environment
+bootstrap: install-hooks ## bootstrap the development environment
 	pip install -U "pip ~= 26.0"
 	pip install -U "setuptools ~= 82.0"
 	pip install -r requirements.txt
@@ -81,6 +83,9 @@ clean:  ## Remove various artifacts
 		test_data/gha-admin/.terraform.lock.hcl \
 		test_data/gha-admin/terraform.tfstate \
 		test_data/gha-admin/terraform.tfstate.backup \
+		test_data/key/.terraform \
+		test_data/key/.terraform.lock.hcl \
+		test_data/key/terraform.tf \
 		.pytest_cache \
 		tf-apply-trace.txt \
 		tf-destroy-trace.txt
