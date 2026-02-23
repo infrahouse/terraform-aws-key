@@ -1,9 +1,12 @@
 import json
 from os import path as osp
+from os import remove
+from shutil import rmtree
 from textwrap import dedent
 
 import boto3
 import pytest
+from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 from pytest_infrahouse import terraform_apply
 
@@ -17,7 +20,7 @@ from tests.conftest import (
 
 def get_probe_client(
     boto3_session: boto3.Session, service_name: str, role_arn: str, region: str
-) -> boto3.client:
+) -> BaseClient:
     """Assume a probe role via the test session and return a service client.
 
     :param boto3_session: A boto3 session with credentials trusted by the probe role.
@@ -38,17 +41,56 @@ def get_probe_client(
     return probe_session.client(service_name, region_name=region)
 
 
+@pytest.mark.parametrize(
+    "aws_provider_version", ["~> 5.62", "~> 6.0"], ids=["aws-5", "aws-6"]
+)
 def test_module(
     probe_role,
     test_role_arn,
     keep_after,
     aws_region,
     boto3_session,
+    aws_provider_version,
 ):
     """Test that key_users can both encrypt and decrypt."""
     probe_role_arn = probe_role["role_arn"]["value"]
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
+
+    # Clean up state so Terraform re-inits with the specified provider version
+    for state_path in [
+        osp.join(terraform_module_dir, ".terraform"),
+        osp.join(terraform_module_dir, ".terraform.lock.hcl"),
+    ]:
+        try:
+            if osp.isdir(state_path):
+                rmtree(state_path)
+            elif osp.isfile(state_path):
+                remove(state_path)
+        except FileNotFoundError:
+            pass
+
+    with open(osp.join(terraform_module_dir, "terraform.tf"), "w") as fp:
+        fp.write(
+            dedent(
+                f"""\
+                terraform {{
+                  required_version = "~> 1.5"
+                  required_providers {{
+                    aws = {{
+                      source  = "hashicorp/aws"
+                      version = "{aws_provider_version}"
+                    }}
+                    random = {{
+                      source  = "hashicorp/random"
+                      version = "~> 3.6"
+                    }}
+                  }}
+                }}
+                """
+            )
+        )
+
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
         fp.write(
             dedent(

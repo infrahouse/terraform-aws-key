@@ -19,6 +19,7 @@ export PRINT_HELP_PYSCRIPT
 
 TEST_REGION="us-west-2"
 TEST_ROLE="arn:aws:iam::303467602807:role/key-tester"
+TEST_SELECTOR="aws-6"
 
 help: install-hooks
 	@python -c "$$PRINT_HELP_PYSCRIPT" < Makefile
@@ -48,6 +49,7 @@ test-keep:  ## Run a test and keep resources
 	pytest -xvvs \
 		--aws-region=${TEST_REGION} \
 		--test-role-arn=${TEST_ROLE} \
+		-k $(TEST_SELECTOR) \
 		--keep-after \
 		tests/test_module.py
 
@@ -56,6 +58,7 @@ test-clean:  ## Run a test and destroy resources
 	pytest -xvvs \
 		--aws-region=${TEST_REGION} \
 		--test-role-arn=${TEST_ROLE} \
+		-k $(TEST_SELECTOR) \
 		tests/test_module.py
 
 .PHONY: bootstrap
