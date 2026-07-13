@@ -36,7 +36,7 @@ write encrypted data and consumers read it, without either having both capabilit
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"

@@ -7,7 +7,7 @@ A minimal KMS key with full encrypt/decrypt access for a single IAM role.
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"
@@ -30,7 +30,7 @@ following the principle of least privilege.
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "data-pipeline"
@@ -61,7 +61,7 @@ attach the key on the launcher's behalf.
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "golden-ami"
@@ -96,7 +96,7 @@ Use the KMS key to encrypt an S3 bucket:
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"
@@ -126,7 +126,7 @@ Combine all three user lists for complex access patterns:
 ```hcl
 module "encryption_key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "shared-data"

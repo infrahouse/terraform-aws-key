@@ -89,7 +89,7 @@ The ARN of the created KMS key. Use this to reference the key in other resources
 ```hcl
 module "key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"
@@ -105,7 +105,7 @@ No key users — only the root account can use the key.
 ```hcl
 module "key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"
@@ -120,7 +120,7 @@ module "key" {
 ```hcl
 module "key" {
   source  = "registry.infrahouse.com/infrahouse/key/aws"
-  version = "0.3.0"
+  version = "0.4.0"
 
   environment     = "production"
   service_name    = "my-app"
