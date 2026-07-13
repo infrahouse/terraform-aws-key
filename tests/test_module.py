@@ -71,9 +71,7 @@ def test_module(
             pass
 
     with open(osp.join(terraform_module_dir, "terraform.tf"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""\
+        fp.write(dedent(f"""\
                 terraform {{
                   required_version = "~> 1.5"
                   required_providers {{
@@ -87,27 +85,17 @@ def test_module(
                     }}
                   }}
                 }}
-                """
-            )
-        )
+                """))
 
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                     region              = "{aws_region}"
                     key_users = ["{probe_role_arn}"]
-                    """
-            )
-        )
+                    """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn        = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_module_dir,
@@ -146,22 +134,14 @@ def test_encrypt_only_permissions(
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                     region                 = "{aws_region}"
                     key_encrypt_only_users = ["{probe_role_arn}"]
-                    """
-            )
-        )
+                    """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn        = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_module_dir,
@@ -202,22 +182,14 @@ def test_decrypt_only_permissions(
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                     region                 = "{aws_region}"
                     key_decrypt_only_users = ["{probe_role_arn}"]
-                    """
-            )
-        )
+                    """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn        = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_module_dir,
@@ -270,22 +242,14 @@ def test_launch_users_permissions(
 
     terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
     with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                     region           = "{aws_region}"
                     key_launch_users = ["{probe_role_arn}"]
-                    """
-            )
-        )
+                    """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn        = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_module_dir,
