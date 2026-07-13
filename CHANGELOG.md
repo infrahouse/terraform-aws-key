@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-07-13
+
+### Features
+
+- Add key_launch_users for cross-account encrypted-AMI launches
+
+### Miscellaneous Tasks
+
+- Remove unnecessary .terraform-version from test fixture
+- Bump black to 26.3+
+
 ## [0.3.0] - 2026-02-23
 
 ### Bug Fixes
