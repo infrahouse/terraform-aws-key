@@ -52,6 +52,23 @@
 - **Description:** IAM role ARNs granted decrypt-only access
   (`kms:Decrypt`, `kms:DescribeKey`).
 
+### `key_launch_users`
+
+- **Type:** `list(string)`
+- **Default:** `null`
+- **Description:** Principal ARNs allowed to launch AWS resources (EC2 instances,
+  Auto Scaling Groups) encrypted with this key. In addition to the standard
+  encrypt/decrypt actions, these principals are granted `kms:CreateGrant` scoped
+  with the `kms:GrantIsForAWSResource` condition. AWS services such as EBS and
+  Auto Scaling require this grant to attach the key on the launcher's behalf.
+  Account-root ARNs (`arn:aws:iam::<account_id>:root`) are supported so a consumer
+  account can launch from a CMK-encrypted, cross-account-shared AMI.
+
+!!! note
+    The `kms:GrantIsForAWSResource` condition keeps `kms:CreateGrant` scoped to AWS
+    service integrations (EBS/Auto Scaling) — it does not allow launch users to
+    create arbitrary grants on the key.
+
 ### `tags`
 
 - **Type:** `map(string)`

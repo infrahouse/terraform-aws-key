@@ -50,6 +50,45 @@ See
 [`examples/split-permissions/`](https://github.com/infrahouse/terraform-aws-key/tree/main/examples/split-permissions)
 for a complete working example.
 
+## Cross-Account Encrypted-AMI Launch
+
+Bake a golden AMI encrypted with this CMK in a build account, share it to consumer
+accounts, and let each consumer launch from it — directly or via an Auto Scaling
+Group. The consumer account root ARN is added to `key_launch_users`, which grants
+`kms:CreateGrant` (scoped with `kms:GrantIsForAWSResource`) so EBS/Auto Scaling can
+attach the key on the launcher's behalf.
+
+```hcl
+module "encryption_key" {
+  source  = "registry.infrahouse.com/infrahouse/key/aws"
+  version = "0.3.0"
+
+  environment     = "production"
+  service_name    = "golden-ami"
+  key_name        = "golden-ami"
+  key_description = "CMK used to encrypt golden AMIs shared cross-account"
+
+  # The build account bakes and re-encrypts the AMI.
+  key_users = [
+    "arn:aws:iam::111111111111:role/image-builder"
+  ]
+
+  # Consumer accounts launch EC2/ASG from the shared, encrypted AMI.
+  key_launch_users = [
+    "arn:aws:iam::222222222222:root", # sandbox
+    "arn:aws:iam::333333333333:root", # development
+    "arn:aws:iam::444444444444:root"  # production
+  ]
+}
+```
+
+Without `key_launch_users`, cross-account launches fail with:
+
+```
+Client.InternalError: Client error on launch
+... not authorized to perform: kms:CreateGrant on resource: <cmk arn>
+```
+
 ## S3 Bucket Encryption
 
 Use the KMS key to encrypt an S3 bucket:

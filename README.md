@@ -25,6 +25,8 @@ write encrypted data and consumers read it, without either having both capabilit
 - Configurable key policy via IAM role ARN lists
 - Split encrypt/decrypt permissions (`key_encrypt_only_users`, `key_decrypt_only_users`)
 - Full encrypt+decrypt access via `key_users`
+- Cross-account launch access via `key_launch_users` (grants `kms:CreateGrant` scoped to AWS
+  services, for launching EC2/Auto Scaling from CMK-encrypted, cross-account-shared AMIs)
 - Root account retains full key management access
 - Supports AWS provider versions 5 and 6
 - Standard InfraHouse tagging (environment, service, created_by_module, module_version)
@@ -86,7 +88,7 @@ Full documentation is available at
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.62, < 7.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.54.0 |
 
 ## Modules
 
@@ -109,6 +111,7 @@ No modules.
 | <a name="input_key_decrypt_only_users"></a> [key\_decrypt\_only\_users](#input\_key\_decrypt\_only\_users) | A list of IAM role ARNs that are allowed to decrypt with the key but not encrypt.<br/>If a role appears in both this list and key\_encrypt\_only\_users, it will effectively<br/>have full encrypt+decrypt access (equivalent to key\_users). | `list(string)` | `null` | no |
 | <a name="input_key_description"></a> [key\_description](#input\_key\_description) | A human readable description for the key. | `string` | n/a | yes |
 | <a name="input_key_encrypt_only_users"></a> [key\_encrypt\_only\_users](#input\_key\_encrypt\_only\_users) | A list of IAM role ARNs that are allowed to encrypt with the key but not decrypt.<br/>If a role appears in both this list and key\_decrypt\_only\_users, it will effectively<br/>have full encrypt+decrypt access (equivalent to key\_users). | `list(string)` | `null` | no |
+| <a name="input_key_launch_users"></a> [key\_launch\_users](#input\_key\_launch\_users) | A list of principal ARNs allowed to launch AWS resources (EC2 instances,<br/>Auto Scaling Groups) encrypted with this key. In addition to the standard<br/>encrypt/decrypt actions, these principals are granted kms:CreateGrant scoped<br/>with the kms:GrantIsForAWSResource condition, which AWS services such as EBS<br/>and Auto Scaling require to attach the key on the launcher's behalf.<br/><br/>Account-root ARNs (arn:aws:iam::<account\_id>:root) are supported so a<br/>consumer account can launch from a CMK-encrypted, cross-account-shared AMI. | `list(string)` | `null` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | A descriptive one word name for the key. Letters, digits, and \_-/ are allowed. | `string` | n/a | yes |
 | <a name="input_key_users"></a> [key\_users](#input\_key\_users) | A list of IAM role ARNs that are allowed to use the key for both encrypt and decrypt. | `list(string)` | `null` | no |
 | <a name="input_service_name"></a> [service\_name](#input\_service\_name) | A descriptive name for the service that owns the key. | `string` | n/a | yes |

@@ -7,4 +7,5 @@ module "test" {
   key_users              = var.key_users
   key_encrypt_only_users = var.key_encrypt_only_users
   key_decrypt_only_users = var.key_decrypt_only_users
+  key_launch_users       = var.key_launch_users
 }

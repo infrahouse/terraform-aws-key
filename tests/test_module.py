@@ -251,3 +251,73 @@ def test_decrypt_only_permissions(
                 Plaintext=b"Hello world",
             )
         assert exc_info.value.response["Error"]["Code"] == "AccessDeniedException"
+
+
+def test_launch_users_permissions(
+    probe_role,
+    test_role_arn,
+    keep_after,
+    aws_region,
+    boto3_session,
+):
+    """Test that launch users can use the key and create AWS-resource grants only.
+
+    Launch users get the standard encrypt/decrypt actions plus kms:CreateGrant
+    scoped with kms:GrantIsForAWSResource. A grant that is not for an AWS
+    resource must be denied so CreateGrant stays scoped to service integrations.
+    """
+    probe_role_arn = probe_role["role_arn"]["value"]
+
+    terraform_module_dir = osp.join(TERRAFORM_ROOT_DIR, "key")
+    with open(osp.join(terraform_module_dir, "terraform.tfvars"), "w") as fp:
+        fp.write(
+            dedent(
+                f"""
+                    region           = "{aws_region}"
+                    key_launch_users = ["{probe_role_arn}"]
+                    """
+            )
+        )
+        if test_role_arn:
+            fp.write(
+                dedent(
+                    f"""
+                    role_arn        = "{test_role_arn}"
+                    """
+                )
+            )
+
+    with terraform_apply(
+        terraform_module_dir,
+        destroy_after=not keep_after,
+        json_output=True,
+    ) as tf_output:
+        LOG.info("%s", json.dumps(tf_output, indent=4))
+        kms_key_arn = tf_output["kms_key_arn"]["value"]
+
+        kms_client = get_probe_client(boto3_session, "kms", probe_role_arn, aws_region)
+
+        # A launch user can still encrypt and decrypt directly.
+        cipher_text = encrypt_with_keyring(
+            b"Hello world",
+            kms_key_arn,
+            kms_client=kms_client,
+        )
+        assert (
+            decrypt_with_keyring(
+                cipher_text,
+                kms_key_arn,
+                kms_client=kms_client,
+            )
+            == b"Hello world"
+        )
+
+        # A grant that is not for an AWS resource must be denied — CreateGrant is
+        # scoped with kms:GrantIsForAWSResource, so a manual grant is rejected.
+        with pytest.raises(ClientError) as exc_info:
+            kms_client.create_grant(
+                KeyId=kms_key_arn,
+                GranteePrincipal=probe_role_arn,
+                Operations=["Decrypt"],
+            )
+        assert exc_info.value.response["Error"]["Code"] == "AccessDeniedException"
