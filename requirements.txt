@@ -1,7 +1,11 @@
 aws-encryption-sdk ~= 4.0
+# Note, aws-cryptography-internal-primitives 1.11.2 depends on cryptography < 47,
+# which is vulnerable to some CVEs.
 aws-cryptographic-material-providers ~= 1.11
 pytest-infrahouse ~= 0.24
-infrahouse-core ~= 0.14
+infrahouse-core ~= 1.1
+
+black ~= 26.3
 
 
 # Documentation dependencies
