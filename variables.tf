@@ -43,6 +43,21 @@ variable "key_decrypt_only_users" {
   default     = null
 }
 
+variable "key_launch_users" {
+  description = <<-EOT
+    A list of principal ARNs allowed to launch AWS resources (EC2 instances,
+    Auto Scaling Groups) encrypted with this key. In addition to the standard
+    encrypt/decrypt actions, these principals are granted kms:CreateGrant scoped
+    with the kms:GrantIsForAWSResource condition, which AWS services such as EBS
+    and Auto Scaling require to attach the key on the launcher's behalf.
+
+    Account-root ARNs (arn:aws:iam::<account_id>:root) are supported so a
+    consumer account can launch from a CMK-encrypted, cross-account-shared AMI.
+  EOT
+  type        = list(string)
+  default     = null
+}
+
 variable "service_name" {
   description = "A descriptive name for the service that owns the key."
   type        = string

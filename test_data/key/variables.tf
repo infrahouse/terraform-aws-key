@@ -17,3 +17,7 @@ variable "key_decrypt_only_users" {
   type    = list(string)
   default = null
 }
+variable "key_launch_users" {
+  type    = list(string)
+  default = null
+}
